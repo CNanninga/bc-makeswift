@@ -22,6 +22,8 @@ import {
   LocaleProvider,
   ProductPrice,
   LocaleSwitcher,
+  CategoryName,
+  CategoryDescription
 } from 'components'
 import { Category } from 'lib/bigcommerce'
 import { Locale } from 'lib/locale'
@@ -149,5 +151,21 @@ ReactRuntime.registerComponent(LocaleSwitcher, {
         label: key,
       })),
     }),
+  },
+})
+
+ReactRuntime.registerComponent(CategoryName, {
+  type: 'category-name',
+  label: 'Category name',
+  props: {
+    className: Style({ properties: Style.All }),
+  },
+})
+
+ReactRuntime.registerComponent(CategoryDescription, {
+  type: 'category-description',
+  label: 'Category description',
+  props: {
+    className: Style({ properties: Style.All }),
   },
 })
