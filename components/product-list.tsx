@@ -2,15 +2,17 @@
 import Link from 'next/link'
 
 import { useProducts } from 'lib/products-context'
+import { ProductFragment } from 'lib/bigcommerce'
 
 type Props = {
   className?: string
   categoryEntityId?: string
   count?: number
+  loadedProducts?: ProductFragment[] | null
 }
 
-export function ProductList({ className, categoryEntityId, count }: Props) {
-  const products = useProducts({ categoryEntityId, count })
+export function ProductList({ className, categoryEntityId, count, loadedProducts }: Props) {
+  const products = loadedProducts ?? useProducts({ categoryEntityId, count })
 
   return (
     <div
