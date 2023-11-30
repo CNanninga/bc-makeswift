@@ -20,6 +20,8 @@ import { ProductsContext } from 'lib/products-context'
 import { ProductContext } from 'lib/product-context'
 import { DEFAULT_LOCALE } from 'lib/locale'
 
+import getGlobalProps from 'lib/global-props'
+
 type Props = MakeswiftPageProps & ProductPageProps
 
 export async function getStaticPaths(ctx: GetStaticPathsContext): Promise<GetStaticPathsResult> {
@@ -56,8 +58,11 @@ export async function getStaticProps(
 
   if (slug == null) throw new Error('"slug" URL parameter must be defined.')
 
-  const products = await getProducts()
-  const product = await getProduct(Number.parseInt(slug.toString(), 10))
+  const [products, product, globalProps] = await Promise.all([
+    getProducts(),
+    getProduct(Number.parseInt(slug.toString(), 10)),
+    getGlobalProps(),
+  ])
 
   if (product == null) return { notFound: true, revalidate: 1 }
 
@@ -68,6 +73,7 @@ export async function getStaticProps(
         'cart',
         'product',
       ])),
+      ...globalProps,
       snapshot,
       products,
       product,
@@ -80,6 +86,7 @@ export default function Page({ products, product, snapshot }: Props) {
   return (
     <ProductsContext.Provider value={products}>
       <ProductContext.Provider value={product}>
+        <h1>PRODUCT PAGE</h1>
         <MakeswiftPage snapshot={snapshot} />
       </ProductContext.Provider>
     </ProductsContext.Provider>

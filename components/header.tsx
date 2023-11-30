@@ -5,6 +5,8 @@ import { MouseEvent } from 'react'
 import { Cart } from './cart'
 import { LocaleSwitcher } from './locale/locale-switcher'
 
+import { useTopCategories } from 'lib/top-categories-context'
+
 type LinkValue = {
   href: string
   target: '_blank' | '_self' | undefined
@@ -23,6 +25,9 @@ type Props = {
 
 export function Header({ className, links, localeSwitcherDisabled, cartDisabled }: Props) {
   const isOnline = useIsOnline()
+
+  const topCategories = useTopCategories()
+
   return (
     <div className={`${className} h-12 grid  grid-cols-3 `}>
       <div className="flex space-x-5 items-center">
@@ -40,6 +45,11 @@ export function Header({ className, links, localeSwitcherDisabled, cartDisabled 
             />
           </svg>
         </Link>
+        {topCategories.map(category => (
+          <Link href={`/category/${category.entityId}`} key={category.entityId}>
+            {category.name}
+          </Link>
+        ))}
         {links.map((link, i) => (
           <Link
             href={link.link?.href ?? '#'}

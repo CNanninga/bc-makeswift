@@ -14,6 +14,8 @@ import { ProductsContext } from 'lib/products-context'
 import { getConfig } from 'lib/config'
 import { DEFAULT_LOCALE, Locale } from 'lib/locale'
 
+import getGlobalProps from 'lib/global-props'
+
 type Props = MakeswiftPageProps & PageProps
 
 export async function getStaticPaths(ctx: GetStaticPathsContext) {
@@ -49,7 +51,10 @@ export async function getStaticProps(
 
   if (snapshot == null) return { notFound: true }
 
-  const products = await getProducts()
+  const [products, globalProps] = await Promise.all([
+    getProducts(),
+    getGlobalProps(),
+  ])
 
   return {
     props: {
@@ -59,6 +64,7 @@ export async function getStaticProps(
         null,
         [Locale.English, Locale.Spanish],
       )),
+      ...globalProps,
       snapshot,
       products,
     },
