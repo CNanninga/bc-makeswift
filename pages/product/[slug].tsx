@@ -86,7 +86,6 @@ export default function Page({ products, product, snapshot }: Props) {
   return (
     <ProductsContext.Provider value={products}>
       <ProductContext.Provider value={product}>
-        <h1>PRODUCT PAGE</h1>
         <MakeswiftPage snapshot={snapshot} />
       </ProductContext.Provider>
     </ProductsContext.Provider>
