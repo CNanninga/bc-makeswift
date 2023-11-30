@@ -12,7 +12,8 @@ type Props = {
 }
 
 export function ProductList({ className, categoryEntityId, count, loadedProducts }: Props) {
-  const products = loadedProducts ?? useProducts({ categoryEntityId, count })
+  const defaultProducts = useProducts({ categoryEntityId, count })
+  const products = loadedProducts ?? defaultProducts
 
   return (
     <div
