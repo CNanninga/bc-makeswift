@@ -12,5 +12,6 @@ export type ProductPageProps = {
 
 export type CategoryPageProps = {
   products: ProductFragment[]
-  category: FullCategory
+  category: FullCategory,
+  categoryProducts: ProductFragment[]
 }

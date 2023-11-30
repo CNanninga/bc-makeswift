@@ -13,9 +13,10 @@ import getGlobalProps from 'lib/global-props';
 import { CategoryPageProps } from 'lib/types';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { DEFAULT_LOCALE } from 'lib/locale';
-import { getFullCategory } from 'lib/my-bigcommerce/api';
+import { getFullCategory, getCategoryProducts } from 'lib/my-bigcommerce/api';
 import { ProductsContext } from 'lib/products-context';
 import { CategoryContext } from 'lib/category-context';
+import { CategoryProductsContext } from 'lib/category-products-context';
 
 type Props = MakeswiftPageProps & CategoryPageProps;
 
@@ -52,9 +53,11 @@ export async function getStaticProps(ctx: GetStaticPropsContext): Promise<GetSta
 
     if (slug == null) throw new Error('"slug" URL parameter must be defined.')
 
-    const [products, category, globalProps] = await Promise.all([
+    const catId = Number.parseInt(slug.toString(), 10);
+    const [products, category, categoryProducts, globalProps] = await Promise.all([
         getProducts(),
-        getFullCategory(Number.parseInt(slug.toString(), 10)),
+        getFullCategory(catId),
+        getCategoryProducts(catId),
         getGlobalProps()
     ])
 
@@ -71,17 +74,20 @@ export async function getStaticProps(ctx: GetStaticPropsContext): Promise<GetSta
             snapshot,
             products,
             category,
+            categoryProducts,
         },
         revalidate: 1,
     }
 }
 
-export default function CategoryPage({products, category, snapshot}: Props) {
+export default function CategoryPage({products, category, categoryProducts, snapshot}: Props) {
     return (
-        <CategoryContext.Provider value={category}>
-            <ProductsContext.Provider value={products}>
-                <MakeswiftPage snapshot={snapshot} />
-            </ProductsContext.Provider>
-        </CategoryContext.Provider>
+        <ProductsContext.Provider value={products}>
+            <CategoryContext.Provider value={category}>
+                <CategoryProductsContext.Provider value={categoryProducts}>
+                    <MakeswiftPage snapshot={snapshot} />
+                </CategoryProductsContext.Provider>
+            </CategoryContext.Provider>
+        </ProductsContext.Provider>
     )
 }
