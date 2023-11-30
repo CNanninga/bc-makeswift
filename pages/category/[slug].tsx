@@ -13,6 +13,9 @@ import getGlobalProps from 'lib/global-props';
 import { CategoryPageProps } from 'lib/types';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { DEFAULT_LOCALE } from 'lib/locale';
+import { getFullCategory } from 'lib/my-bigcommerce/api';
+import { ProductsContext } from 'lib/products-context';
+import { CategoryContext } from 'lib/category-context';
 
 type Props = MakeswiftPageProps & CategoryPageProps;
 
@@ -45,10 +48,17 @@ export async function getStaticProps(ctx: GetStaticPropsContext): Promise<GetSta
     
     if (snapshot == null) return { notFound: true, revalidate: 1 }
 
-    const [products, globalProps] = await Promise.all([
+    const slug = ctx.params?.slug
+
+    if (slug == null) throw new Error('"slug" URL parameter must be defined.')
+
+    const [products, category, globalProps] = await Promise.all([
         getProducts(),
+        getFullCategory(Number.parseInt(slug.toString(), 10)),
         getGlobalProps()
     ])
+
+    if (category == null) return { notFound: true, revalidate: 1 }
 
     return {
         props: {
@@ -59,14 +69,19 @@ export async function getStaticProps(ctx: GetStaticPropsContext): Promise<GetSta
               ])),
             ...globalProps,
             snapshot,
-            products
+            products,
+            category,
         },
         revalidate: 1,
     }
 }
 
-export default function CategoryPage({products, snapshot}: Props) {
+export default function CategoryPage({products, category, snapshot}: Props) {
     return (
-        <MakeswiftPage snapshot={snapshot} />
+        <CategoryContext.Provider value={category}>
+            <ProductsContext.Provider value={products}>
+                <MakeswiftPage snapshot={snapshot} />
+            </ProductsContext.Provider>
+        </CategoryContext.Provider>
     )
 }
